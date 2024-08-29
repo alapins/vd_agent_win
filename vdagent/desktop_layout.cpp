@@ -48,6 +48,16 @@ DesktopLayout::~DesktopLayout()
     delete _display_config;
 }
 
+static BOOL
+dev_has_monitor(DISPLAY_DEVICE &dev_info)
+{
+    DISPLAY_DEVICE mon_info;
+
+    ZeroMemory(&mon_info, sizeof(mon_info));
+    mon_info.cb = sizeof(mon_info);
+    return EnumDisplayDevices(dev_info.DeviceName, 0, &mon_info, 0);
+}
+
 static bool
 get_next_display(DWORD &dev_id, DISPLAY_DEVICE &dev_info)
 {
@@ -62,6 +72,9 @@ get_next_display(DWORD &dev_id, DISPLAY_DEVICE &dev_info)
             continue;
         }
         if (wcsstr(dev_info.DeviceString, L"Citrix Indirect Display")) {
+            continue;
+        }
+        if (!dev_has_monitor(dev_info)) {
             continue;
         }
         return true;
